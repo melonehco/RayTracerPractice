@@ -9,26 +9,18 @@
 
 #include <stdlib.h> //for drand48
 #include <iostream>
+#include <fstream>
 #include "float.h"
 #include "sphere.h"
 #include "hitable_list.h"
 #include "camera.h"
-
-vec3 random_in_unit_sphere()
-{
-    vec3 p;
-    do //keep randomizing in unit cube until we get a point that's inside unit sphere
-    {
-        p = vec3::scale((vec3(drand48(), drand48(), drand48()) - vec3(1, 1, 1)),
-                        2.0);
-    } while (p.squared_length() >= 1.0);
-
-    return p;
-}
+#include "lambertian.h"
+#include "metal.h"
 
 /* returns the color at the point intersected in the given world by the given ray
+ * runs recursively for scattering rays; depth indicates recursion depth
  */
-vec3 color(const ray& r, hitable *world)
+vec3 color(const ray& r, hitable *world, int depth)
 {
     hit_record rec;
 
@@ -36,9 +28,18 @@ vec3 color(const ray& r, hitable *world)
     //min t is 0.001 to get rid of shadow acne (hits at t's very close to 0)
     if (world->hit(r, 0.001, MAXFLOAT, rec))
     {
-        vec3 target = rec.p + rec.normal + random_in_unit_sphere();
-        return vec3::scale(color( ray(rec.p, target-rec.p), world ),
-                           0.5);
+        ray scattered;
+        vec3 attenuation;
+
+        if (depth < 50 && rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+        {
+            //std::cout << "calling color recursively\n";
+            return attenuation * color(scattered, world, depth+1);
+        }
+        else
+        {
+            return vec3(0, 0, 0);
+        }
     }
 
     //no intersection
@@ -48,20 +49,32 @@ vec3 color(const ray& r, hitable *world)
     //linear interpolation (gradient) between white and blue
 }
 
-int main()
+int main(int argc, char **argv)
 {
     int width = 200;
     int height = 100;
     int num_samples = 100;
 
-    std::cout << "P3\n" << width << " " << height << "\n255\n";
+    std::ofstream imgfile;
+    if (argc > 1)
+    {
+        imgfile.open ( argv[1] );
+    }
+    else
+    {
+        imgfile.open ("ray-trace-out.ppm");
+    }
+    imgfile << "P3\n" << width << " " << height << "\n255\n";
 
     camera cam;
 
-    hitable *list[2];
-    list[0] = new sphere(vec3(0, 0, -1), 0.5); //TODO: what's the difference btw calling with and w/o new?
-    list[1] = new sphere(vec3(0, -100.5, -1), 100); //basically the floor
-    hitable *world = new hitable_list(list, 2);
+    hitable *list[4];
+    //TODO: what's the difference btw calling with and w/o new?
+    list[0] = new sphere( vec3(0, 0, -1), 0.5, new lambertian(vec3(0.8, 0.3, 0.3)) );
+    list[1] = new sphere( vec3(0, -100.5, -1), 100, new lambertian(vec3(0.8, 0.8, 0.0)) ); //basically the floor
+    list[2] = new sphere( vec3(1, 0, -1), 0.5, new metal(vec3(0.8, 0.6, 0.2), 1.0) );
+    list[3] = new sphere( vec3(-1, 0, -1), 0.5, new metal(vec3(0.8, 0.8, 0.8), 0.3) );
+    hitable *world = new hitable_list(list, 4);
 
     for (int j = height - 1; j >= 0; j--)
     {
@@ -75,7 +88,7 @@ int main()
                 float u = float(i + drand48()) / float(width);
                 float v = float(j + drand48()) / float(height);
                 ray r = cam.get_ray(u, v);
-                col += color(r, world);
+                col += color(r, world, 0);
             }
             col /= float(num_samples);
             col = vec3( sqrt(col[0]), sqrt(col[1]), sqrt(col[2]) ); //gamma correction
@@ -84,7 +97,9 @@ int main()
             int ig = int(255.99 * col[1]);
             int ib = int(255.99 * col[2]);
             
-            std::cout << ir << " " << ig << " " << ib << "\n";
+            imgfile << ir << " " << ig << " " << ib << "\n";
         }
     }
+
+    imgfile.close();
 }
