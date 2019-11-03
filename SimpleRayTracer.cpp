@@ -7,10 +7,12 @@
  * Fall 2019
  */
 
+#include <stdlib.h> //for drand48
 #include <iostream>
+#include "float.h"
 #include "sphere.h"
 #include "hitable_list.h"
-#include "float.h"
+#include "camera.h"
 
 /* returns the color at the point intersected in the given world by the given ray
  */
@@ -44,28 +46,37 @@ int main()
 {
     int width = 200;
     int height = 100;
+    int num_samples = 100;
+
     std::cout << "P3\n" << width << " " << height << "\n255\n";
 
-    //vectors defining camera origin and axes
-    vec3 lower_left_corner(-2.0, -1.0, -1.0);
-    vec3 horizontal(4.0, 0.0, 0.0); //TODO: why is this one 4?
-    vec3 vertical(0.0, 2.0, 0.0);
-    vec3 origin(0.0, 0.0, 0.0);
+    camera cam;
 
     hitable *list[2];
     list[0] = new sphere(vec3(0, 0, -1), 0.5); //TODO: what's the difference btw calling with and w/o new?
     list[1] = new sphere(vec3(0, -100.5, -1), 100); //basically the floor
     hitable *world = new hitable_list(list, 2);
-    //hitable *world = list[0];
 
     for (int j = height - 1; j >= 0; j--)
     {
         for (int i = 0; i < width; i++)
         {
-            float u = float(i) / float(width);
-            float v = float(j) / float(height);
-            ray r(origin, lower_left_corner + vec3::scale(horizontal, u) + vec3::scale(vertical, v));
-            vec3 col = color(r, world);
+            vec3 col(0, 0, 0);
+
+            //average colors from samples across pixel
+            for (int s = 0; s < num_samples; s++)
+            {
+                float u = float(i + drand48()) / float(width);
+                float v = float(j + drand48()) / float(height);
+                ray r = cam.get_ray(u, v);
+                col += color(r, world);
+            }
+            col /= float(num_samples);
+            
+            // float u = float(i) / float(width);
+            // float v = float(j) / float(height);
+            // ray r(origin, lower_left_corner + vec3::scale(horizontal, u) + vec3::scale(vertical, v));
+            // vec3 col = color(r, world);
             
             int ir = int(255.99 * col[0]);
             int ig = int(255.99 * col[1]);
