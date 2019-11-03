@@ -14,25 +14,31 @@
 #include "hitable_list.h"
 #include "camera.h"
 
+vec3 random_in_unit_sphere()
+{
+    vec3 p;
+    do //keep randomizing in unit cube until we get a point that's inside unit sphere
+    {
+        p = vec3::scale((vec3(drand48(), drand48(), drand48()) - vec3(1, 1, 1)),
+                        2.0);
+    } while (p.squared_length() >= 1.0);
+
+    return p;
+}
+
 /* returns the color at the point intersected in the given world by the given ray
  */
 vec3 color(const ray& r, hitable *world)
 {
     hit_record rec;
-    //vec3 sphere_center = vec3(0, 0, -1);
-
-    // float t = hit_sphere(sphere_center, 0.5, r); //t of intersection along ray
-    // if (t > 0.0) //if there is an intersection
-    // {
-    //     vec3 N = vec3::unit_vector(r.point_at_t(t) - sphere_center); //surface normal
-    //     //map from [-1, 1] range to [0, 1]
-    //     return vec3::scale(vec3(N.x() + 1, N.y() + 1, N.z() + 1), 0.5);
-    // }
 
     //if intersection, color based on surface normal
-    if (world->hit(r, 0.0, MAXFLOAT, rec))
+    //min t is 0.001 to get rid of shadow acne (hits at t's very close to 0)
+    if (world->hit(r, 0.001, MAXFLOAT, rec))
     {
-        return vec3::scale(vec3(rec.normal.x() + 1, rec.normal.y() + 1, rec.normal.z() + 1), 0.5);
+        vec3 target = rec.p + rec.normal + random_in_unit_sphere();
+        return vec3::scale(color( ray(rec.p, target-rec.p), world ),
+                           0.5);
     }
 
     //no intersection
@@ -72,11 +78,7 @@ int main()
                 col += color(r, world);
             }
             col /= float(num_samples);
-            
-            // float u = float(i) / float(width);
-            // float v = float(j) / float(height);
-            // ray r(origin, lower_left_corner + vec3::scale(horizontal, u) + vec3::scale(vertical, v));
-            // vec3 col = color(r, world);
+            col = vec3( sqrt(col[0]), sqrt(col[1]), sqrt(col[2]) ); //gamma correction
             
             int ir = int(255.99 * col[0]);
             int ig = int(255.99 * col[1]);
