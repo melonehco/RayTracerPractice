@@ -10,8 +10,10 @@
 #include <iostream>
 #include "ray.h"
 
-//returns whether the given ray hits the sphere defined by the given center and radius
-bool hit_sphere(const vec3& center, float radius, const ray& r)
+/* returns the t where the given ray hits the sphere defined by the given center and radius,
+ * or -1 if there is no intersection
+ */
+float hit_sphere(const vec3& center, float radius, const ray& r)
 {
     //math based on manipulating equations defining sphere and ray, as described in ch 4
     vec3 oc = r.origin() - center;
@@ -19,20 +21,35 @@ bool hit_sphere(const vec3& center, float radius, const ray& r)
     float b = 2.0 * vec3::dot(oc, r.direction());
     float c = vec3::dot(oc, oc) - radius * radius;
     float discriminant = b*b - 4*a*c;
-    return discriminant > 0;
+    if (discriminant < 0)
+    {
+        return -1.0;
+    }
+    else
+    {
+        //quadratic formula to solve for the (closer) t of intersection
+        return (-b - sqrt(discriminant)) / (2.0*a);
+    }
 }
 
-//returns the color at the point intersected by the given ray
+/* returns the color at the point intersected by the given ray
+ * (coloring sphere by mapping unit vector surface normals to colors)
+ */
 vec3 color(const ray& r)
 {
-    //if hits sphere, return sphere color (red)
-    if (hit_sphere(vec3(0, 0, -1), 0.5, r))
+    vec3 sphere_center = vec3(0, 0, -1);
+
+    float t = hit_sphere(sphere_center, 0.5, r); //t of intersection along ray
+    if (t > 0.0) //if there is an intersection
     {
-        return vec3(1, 0, 0);
+        vec3 N = vec3::unit_vector(r.point_at_t(t) - sphere_center); //surface normal
+        //map from [-1, 1] range to [0, 1]
+        return vec3::scale(vec3(N.x() + 1, N.y() + 1, N.z() + 1), 0.5);
     }
-    
+
+    //no intersection
     vec3 unit_direction = vec3::unit_vector(r.direction());
-    float t = 0.5*(unit_direction.y() + 1.0); //how far along y
+    t = 0.5*(unit_direction.y() + 1.0); //how far along y
     return vec3::scale( vec3(1.0, 1.0, 1.0), (1.0-t) ) + vec3::scale( vec3(0.5, 0.7, 1.0), t);
     //linear interpolation between white and blue
 }
