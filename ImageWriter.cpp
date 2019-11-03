@@ -1,5 +1,9 @@
-/*
- *
+/* ImageWriter.cpp
+ * Writes an image out to a PPM file
+ * based on the ray-tracing tutorial at https://www.realtimerendering.com/raytracing/Ray%20Tracing%20in%20a%20Weekend.pdf
+ * 
+ * Melody Mao
+ * Fall 2019
  */
 
 #include <iostream>
