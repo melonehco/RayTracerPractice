@@ -67,8 +67,12 @@ int main(int argc, char **argv)
     }
     imgfile << "P3\n" << width << " " << height << "\n255\n";
 
-    //         look from       look at         vup            vfov, aspect ratio
-    camera cam(vec3(-2, 2, 1), vec3(0, 0, -1), vec3(0, 1, 0), 50, float(width)/float(height));
+    vec3 lookfrom(3, 3, 2);
+    vec3 lookat(0, 0, -1);
+    float dist_to_focus = (lookat - lookfrom).length();
+    float aperture = 2.0;
+    //         look from, look at, vup          vfov, aspect ratio
+    camera cam(lookfrom, lookat, vec3(0, 1, 0), 20, float(width)/float(height), aperture, dist_to_focus);
 
     hitable *list[4];
     //TODO: what's the difference btw calling with and w/o new?
