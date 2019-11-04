@@ -16,6 +16,7 @@
 #include "camera.h"
 #include "lambertian.h"
 #include "metal.h"
+#include "dielectric.h"
 
 /* returns the color at the point intersected in the given world by the given ray
  * runs recursively for scattering rays; depth indicates recursion depth
@@ -72,8 +73,9 @@ int main(int argc, char **argv)
     //TODO: what's the difference btw calling with and w/o new?
     list[0] = new sphere( vec3(0, 0, -1), 0.5, new lambertian(vec3(0.8, 0.3, 0.3)) );
     list[1] = new sphere( vec3(0, -100.5, -1), 100, new lambertian(vec3(0.8, 0.8, 0.0)) ); //basically the floor
-    list[2] = new sphere( vec3(1, 0, -1), 0.5, new metal(vec3(0.8, 0.6, 0.2), 1.0) );
-    list[3] = new sphere( vec3(-1, 0, -1), 0.5, new metal(vec3(0.8, 0.8, 0.8), 0.3) );
+    list[2] = new sphere( vec3(1, 0, -1), 0.5, new dielectric(1.5) );
+    //list[3] = new sphere( vec3(1, 0, -1), -0.45, new dielectric(1.5) ); //inner sphere for bubble
+    list[3] = new sphere( vec3(-1, 0, -1), 0.5, new metal(vec3(0.8, 0.8, 0.8), 0.2) );
     hitable *world = new hitable_list(list, 4);
 
     for (int j = height - 1; j >= 0; j--)

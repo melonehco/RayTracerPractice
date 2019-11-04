@@ -11,6 +11,7 @@
 
 #include "ray.h"
 
+//returns a random point in the unit sphere
 vec3 random_in_unit_sphere()
 {
     vec3 p;
@@ -21,6 +22,12 @@ vec3 random_in_unit_sphere()
     } while (p.squared_length() >= 1.0);
 
     return p;
+}
+
+//reflects v about n
+vec3 reflect(const vec3& v, const vec3& n)
+{
+    return v - vec3::scale(n, 2*vec3::dot(v, n));
 }
 
 class material

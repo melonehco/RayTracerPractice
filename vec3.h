@@ -153,12 +153,6 @@ public:
         return vec3(t * v.e[0], t * v.e[1], t * v.e[2]);
     }
 
-    //reflects v about n
-    static vec3 reflect(const vec3& v, const vec3& n)
-    {
-        return v - scale(n, 2*dot(v, n));
-    }
-
     float e[3];
 };
 

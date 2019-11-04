@@ -20,7 +20,7 @@ class metal: public material
         virtual bool scatter(const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered) const
         {
             //reflect incoming ray about surface normal
-            vec3 reflected = vec3::reflect(vec3::unit_vector(r_in.direction()), rec.normal);
+            vec3 reflected = reflect(vec3::unit_vector(r_in.direction()), rec.normal);
             scattered = ray(rec.p, reflected + vec3::scale(random_in_unit_sphere(), fuzz));
             attenuation = albedo;
             return vec3::dot(scattered.direction(), rec.normal) > 0;
