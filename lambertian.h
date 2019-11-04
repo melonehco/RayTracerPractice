@@ -1,6 +1,7 @@
 /* lambertian.h
  * Defines the lambertian class, a subclass of material
  * that defines scattering for Lambertian (diffuse) materials
+ * The albedo passed in basically gives the surface color
  * based on the ray-tracing tutorial at https://www.realtimerendering.com/raytracing/Ray%20Tracing%20in%20a%20Weekend.pdf
  * 
  * Melody Mao
