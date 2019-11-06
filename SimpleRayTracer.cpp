@@ -34,7 +34,6 @@ vec3 color(const ray& r, hitable *world, int depth)
 
         if (depth < 50 && rec.mat_ptr->scatter(r, rec, attenuation, scattered))
         {
-            //std::cout << "calling color recursively\n";
             return attenuation * color(scattered, world, depth+1);
         }
         else
@@ -121,7 +120,6 @@ int main(int argc, char **argv)
     camera cam(lookfrom, lookat, vec3(0, 1, 0), 90, float(width)/float(height), aperture, dist_to_focus);
 
     //hitable *list[4];
-    //TODO: what's the difference btw calling with and w/o new?
     //----------------------version up to ch 9
     // list[0] = new sphere( vec3(0, 0, -1), 0.5, new lambertian(vec3(0.8, 0.3, 0.3)) );
     // list[1] = new sphere( vec3(0, -100.5, -1), 100, new lambertian(vec3(0.8, 0.8, 0.0)) ); //basically the floor

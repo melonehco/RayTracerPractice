@@ -91,12 +91,6 @@ class dielectric: public material
             }
 
             return true;
-
-            //reflect incoming ray about surface normal
-            // vec3 reflected = vec3::reflect(vec3::unit_vector(r_in.direction()), rec.normal);
-            // scattered = ray(rec.p, reflected + vec3::scale(random_in_unit_sphere(), fuzz));
-            // attenuation = albedo;
-            // return vec3::dot(scattered.direction(), rec.normal) > 0;
         }
 
         float refract_idx;

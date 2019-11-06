@@ -24,15 +24,15 @@ public:
     inline float r() const { return e[0]; }
     inline float g() const { return e[1]; }
     inline float b() const { return e[2]; }
-    //TODO: read more on inline functions
+    //these inlines basically function the way we used macros in graphics;
+    //but macros are discouraged in C++
 
     //overloaded operators
-    //TODO: look up operator overloading
-    //TODO: also what do the consts mean
     inline const vec3& operator+() const { return *this; }
     inline vec3 operator-() const { return vec3(-e[0], -e[1], -e[2]); }
     inline float operator[](int i) const { return e[i]; }
     inline float& operator[](int i) { return e[i]; }
+    //const return value vs const member function vs const function parameter (vs const variable)
 
     inline vec3& operator+=(const vec3 &v2)
     {

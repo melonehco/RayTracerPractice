@@ -31,5 +31,5 @@ int main()
         }
     }
 
-    //TODO: write out to file
+    //TODO: write out to file (implemented in SimpleRayTracer, not here)
 }

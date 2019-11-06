@@ -12,7 +12,9 @@
 #include "hitable.h"
 #include "material.h"
 
-class sphere: public hitable //TODO: what is the "public" here for?
+//apparently the "public" before hitable means that the public members of hitable
+//become public members of sphere, and similarly for the protected members
+class sphere: public hitable
 {
     public:
         sphere() {}
@@ -31,10 +33,10 @@ bool sphere::hit(const ray& r, float t_min, float t_max, hit_record& rec) const
     float a = vec3::dot(r.direction(), r.direction());
     float b = 2.0 * vec3::dot(oc, r.direction());
     float c = vec3::dot(oc, oc) - radius * radius;
-    float discriminant = b*b - 4*a*c; //TODO: the tutorial changed this, but it didn't work??
+    float discriminant = b*b - 4*a*c; //note: the tutorial changed this 4 to 2, but it didn't work??
     if (discriminant > 0) //if there is intersection
     {
-        float temp = (-b - sqrt(discriminant)) / (2.0*a); //TODO: tutorial changed this as well
+        float temp = (-b - sqrt(discriminant)) / (2.0*a); //note: tutorial changed this as well, taking out the 2, here and below
         if (temp < t_max && temp > t_min) //if t is within desired interval
         {
             rec.t = temp;
